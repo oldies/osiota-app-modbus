@@ -33,7 +33,7 @@ exports.init = function(node, app_config, main, host_info) {
 
 	if (typeof app_config.devices !== "object" ||
 			!Array.isArray(app_config.devices)) {
-		throw new Exception("Modbus: Devices not defined.");
+		throw new Error("Modbus: Devices not defined.");
 	}
 
 	if (typeof app_config.models === "object") {
@@ -53,7 +53,7 @@ exports.init = function(node, app_config, main, host_info) {
 				typeof models[d.type] === "object") {
 			return models[d.type];
 		}
-		throw new Exception("Modbus: Client config not found.");
+		throw new Error("Modbus: Client config not found.");
 	}
 
 	var map_itemtype = function(type) {
