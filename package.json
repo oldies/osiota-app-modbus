@@ -1,0 +1,11 @@
+{
+  "name": "er-app-modbus",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "modbus-serial": "^4.5.1"
+  },
+  "devDependencies": {},
+  "author": "Simon Walz"
+}
