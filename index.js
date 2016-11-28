@@ -10,9 +10,9 @@ var map_value = function(datatype, data) {
 
 var remap_value = function(datatype, value) {
 	if (datatype == "uint16") {
-		return [ value ];
+		return [ value*1 ];
 	}
-	return [ value ];
+	return [ value*1 ];
 };
 
 exports.init = function(node, app_config, main, host_info) {
@@ -49,9 +49,15 @@ exports.init = function(node, app_config, main, host_info) {
 		if (typeof d.client === "object") {
 			return d.client;
 		}
-		if (typeof d.type === "string" && 
-				typeof models[d.type] === "object") {
-			return models[d.type];
+		if (typeof d.model === "string" &&
+				typeof models[d.model] === "object") {
+			return models[d.model];
+		}
+		if (typeof d.address !== "undefined" &&
+				typeof d.name === "string") {
+			var v = {};
+			v[d.name] = d;
+			return v;
 		}
 		throw new Error("Modbus: Client config not found.");
 	}
@@ -85,10 +91,11 @@ exports.init = function(node, app_config, main, host_info) {
 
 	var create_er_binding = function(item, command, cid, prefix, nodename) {
 		var n = node.node(prefix+nodename);
+		n.announce(item.meta);
 
 		if (!item.ignore) {
 			// TODO: length aus datatype ermitteln.
-			m.client_add(type, cid, {
+			m.client_add(command, cid, {
 				"address": item.address || 0,
 				"length": item.length || 1,
 				"callback": function(data) {
@@ -98,13 +105,13 @@ exports.init = function(node, app_config, main, host_info) {
 				}
 			});
 		}
-		if (m.client_can_set(type)) {
-			n.rpc("set", function(reply, value) {
+		if (m.client_can_set(command)) {
+			n.rpc_set = function(reply, value) {
 				var data = remap_value(item.datatype, value);
-				m.client_set(type, cid, address, data, function() {
+				m.client_set(command, cid, item.address, data, function() {
 					reply(null, "okay");
 				});
-			});
+			};
 		}
 
 	};
@@ -122,11 +129,11 @@ exports.init = function(node, app_config, main, host_info) {
 		}
 		id = cid+1;
 
-		for (var nodenname in model) {
+		for (var nodename in model) {
 			var item = model[nodename];
-			var type = map_itemtype(item.type);
+			var command = map_itemtype(item.type);
 
-			create_er_binding(item, type, cid, prefix, nodename);
+			create_er_binding(item, command, cid, prefix, nodename);
 		}
 	});
 

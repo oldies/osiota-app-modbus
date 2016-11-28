@@ -3,7 +3,7 @@ var ModbusRTU = require("modbus-serial");
 
 var read_data = function(client_items, address_min, data) {
 	client_items.forEach(function(c) {
-		c.callback(data.splice(c.address-address_min,
+		c.callback(data.slice(c.address-address_min,
 				c.address-address_min+c.length));
 	});
 };
@@ -33,7 +33,7 @@ exports.modbus = function() {
 			clients: {}
 		}
 	};
-	
+
 	this.poll_commands = [];
 	this.set_commands = [];
 
@@ -42,14 +42,17 @@ exports.modbus = function() {
 	this.run_do = function() {
 		if (this.set_commands.length != 0) {
 			this.set_commands.shift()(this.run.bind(this));
-		} else {
+		} else if (this.poll_commands.length != 0) {
 			this.poll_commands[this.pc_id](this.run.bind(this));
 			this.pc_id = (this.pc_id+1) % this.poll_commands.length;
+		} else {
+			setTimeout(this.run.bind(this), 100);
 		}
 	};
 	this.run = function() {
+		var _this = this;
 		setTimeout(function() {
-			this.run_do();
+			_this.run_do();
 		}, 10);
 	};
 
@@ -86,6 +89,9 @@ exports.modbus.prototype.client_set = function(type, cid, address, data, ext_cal
 };
 
 exports.modbus.prototype.send_poll = function(command, cid, address, length, client_items, callback) {
+	if (typeof this.client[command] !== "function") {
+		throw new Error("undefined command: " + command);
+	}
 	this.client[command].call(this.client,
 			cid,
 			address,
@@ -101,6 +107,9 @@ exports.modbus.prototype.send_poll = function(command, cid, address, length, cli
        );
 };
 exports.modbus.prototype.send_set = function(command, cid, o, data, callback) {
+	if (typeof this.client[command] !== "function") {
+		throw new Error("undefined command: " + command);
+	}
 	this.client[command].call(this.client,
 			cid,
 			o.address,
@@ -115,18 +124,18 @@ exports.modbus.prototype.send_set = function(command, cid, o, data, callback) {
 };
 
 // open connection to a port
-exports.modbus.prototype.connect = function(connect_type, path, options);
+exports.modbus.prototype.connect = function(connect_type, path, options) {
 
 	if (typeof this.client["connect" + connect_type] !== "function") {
 		throw new Error("Modbus: connect type unknown");
 	}
 	this.client["connect"+connect_type](path, options, this.run.bind(this));
 
-	for (var type in commands) {
-	for (var cid in commands[type]) {
+	for (var type in this.commands) {
+	for (var cid in this.commands[type].clients) {
 		var address_min = null;
 		var address_max = null;
-		commands[type].clients[cid].forEach(function(c) {
+		this.commands[type].clients[cid].forEach(function(c) {
 			if (address_min === null || c.address < address_min) {
 				address_min = c.address;
 			}
@@ -138,13 +147,13 @@ exports.modbus.prototype.connect = function(connect_type, path, options);
 		//commands[type].clients[cid].address = address_min;
 		//commands[type].clients[cid].length = address_max-address_min;
 
-		(function(command, cid, address, length, client_items) {
+		(function(_this, command, cid, address, length, client_items) {
 			_this.poll_commands.push(function(next) {
-				send_poll(command, cid, address, length, client_items, next);
+				_this.send_poll(command, cid, address, length, client_items, next);
 			});
-		})(commands[type].poll_command, cid, address_min,
+		})(this, this.commands[type].command_poll, cid, address_min,
 				address_max-address_min,
-				commands[type].clients[cid]);
+				this.commands[type].clients[cid]);
 	}
 	}
 
