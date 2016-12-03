@@ -43,7 +43,7 @@ exports.init = function(node, app_config, main, host_info) {
 	}
 
 
-	var m = new modbus.modbus();
+	var m = new modbus.modbus(app_config.packet_timeout);
 
 	var get_model = function(d) {
 		if (typeof d.client === "object") {

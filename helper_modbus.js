@@ -8,10 +8,14 @@ var read_data = function(client_items, address_min, data) {
 	});
 };
 
-exports.modbus = function() {
+exports.modbus = function(timeout) {
 	var _this = this;
 
 	this.client = new ModbusRTU();
+	if (typeof timeout != "number") {
+		timeout = 1500;
+	}
+	this.client.setTimeout(timeout);
 
 	this.commands = {
 		"output boolean": {
