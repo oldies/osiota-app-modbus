@@ -107,7 +107,7 @@ exports.modbus.prototype.send_poll = function(command, cid, address, length, cli
 			length,
 		function(err, data) {
 			if (err) {
-				console.log("Modbus-Error:", err);
+				console.log("[poll] Modbus-Error ("+cid+"):", err);
 			} else {
 				read_data(client_items, address, data.data);
 			}
@@ -125,7 +125,7 @@ exports.modbus.prototype.send_set = function(command, cid, address, data, callba
 			data,
 		function(err, data) {
 			if (err) {
-				console.log("Modbus-Error:", err);
+				console.log("[set] Modbus-Error ("+cid+"):", err);
 			}
 			callback();
 		}
