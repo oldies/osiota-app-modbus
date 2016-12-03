@@ -115,13 +115,13 @@ exports.modbus.prototype.send_poll = function(command, cid, address, length, cli
 		}
        );
 };
-exports.modbus.prototype.send_set = function(command, cid, o, data, callback) {
+exports.modbus.prototype.send_set = function(command, cid, address, data, callback) {
 	if (typeof this.client[command] !== "function") {
 		throw new Error("undefined command: " + command);
 	}
 	this.client[command].call(this.client,
 			cid,
-			o.address,
+			address,
 			data,
 		function(err, data) {
 			if (err) {
