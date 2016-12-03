@@ -47,8 +47,13 @@ exports.modbus = function(timeout) {
 		if (this.set_commands.length != 0) {
 			this.set_commands.shift()(this.run.bind(this));
 		} else if (this.poll_commands.length != 0) {
-			this.poll_commands[this.pc_id](this.run.bind(this));
-			this.pc_id = (this.pc_id+1) % this.poll_commands.length;
+			if (this.pc_id == this.poll_commands.length) {
+				setTimeout(this.run.bind(this), 100);
+				this.pc_id = 0;
+			} else {
+				this.poll_commands[this.pc_id](this.run.bind(this));
+				this.pc_id++;
+			}
 		} else {
 			setTimeout(this.run.bind(this), 100);
 		}
