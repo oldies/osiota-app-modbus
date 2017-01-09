@@ -8,14 +8,26 @@ var read_data = function(client_items, address_min, data) {
 	});
 };
 
-exports.modbus = function(timeout) {
+exports.modbus = function(config) {
 	var _this = this;
 
 	this.client = new ModbusRTU();
-	if (typeof timeout != "number") {
-		timeout = 1500;
+	if (typeof config !== "object") {
+		config = {};
 	}
-	this.client.setTimeout(timeout);
+	if (typeof config.packet_timeout !== "number") {
+		config.packet_timeout = 1500;
+	}
+	if (typeof config.packet_delay !== "number") {
+		config.packet_delay = 10;
+	}
+	if (typeof config.circle_delay !== "number") {
+		config.circle_delay = 100;
+	}
+
+	this.packet_delay = config.packet_delay;
+	this.circle_delay = config.circle_delay;
+	this.client.setTimeout(config.timeout);
 
 	this.commands = {
 		"output boolean": {
@@ -48,21 +60,22 @@ exports.modbus = function(timeout) {
 			this.set_commands.shift()(this.run.bind(this));
 		} else if (this.poll_commands.length != 0) {
 			if (this.pc_id == this.poll_commands.length) {
-				setTimeout(this.run.bind(this), 100);
+				setTimeout(this.run.bind(this), this.circle_delay);
 				this.pc_id = 0;
 			} else {
 				this.poll_commands[this.pc_id](this.run.bind(this));
 				this.pc_id++;
 			}
 		} else {
-			setTimeout(this.run.bind(this), 100);
+			// no poll commands
+			setTimeout(this.run.bind(this), this.circle_delay);
 		}
 	};
 	this.run = function() {
 		var _this = this;
 		setTimeout(function() {
 			_this.run_do();
-		}, 10);
+		}, this.packet_delay);
 	};
 
 };
