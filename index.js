@@ -5,12 +5,18 @@ var map_value = function(datatype, data) {
 	if (datatype == "uint16") {
 		return data[0];
 	}
+	else if (datatype == "boolean") {
+		return data[0] != 0;
+	}
 	return data[0];
 };
 
 var remap_value = function(datatype, value) {
 	if (datatype == "uint16") {
 		return [ value*1 ];
+	}
+	else if (datatype == "boolean") {
+		return [ value != 0 ];
 	}
 	return [ value*1 ];
 };
@@ -93,15 +99,22 @@ exports.init = function(node, app_config, main, host_info) {
 		var n = node.node(prefix+nodename);
 		n.announce(item.meta);
 
+		var lenth = 1;
+		if (item.hasOwnProperty("length")) {
+			length = item.length;
+		} else {
+			var tmp = remap_value(item.datatype, 0);
+			length = tmp.length;
+		}
+
 		if (!item.ignore) {
 			// TODO: length aus datatype ermitteln.
 			m.client_add(command, cid, {
 				"address": item.address || 0,
-				"length": item.length || 1,
+				"length": length || 1,
 				"callback": function(data) {
 					var value = map_value(item.datatype, data);
 					n.publish(undefined, value, true);
-
 				}
 			});
 		}
