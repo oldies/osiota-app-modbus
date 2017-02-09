@@ -1,0 +1,86 @@
+{
+	"type": "object",
+	"title": "Settings",
+	"properties": {
+		"connect_type": {
+			"type": "string",
+			"enum": [ "RTU", "TCP", "Telnet", "C701", "RTUBuffered", "AsciiSerial" ]
+		},
+		"connect_path": {
+			"type": "string",
+			"title": "Connect Path, i.e. device path"
+		},
+		"devices": {
+			"type": "array",
+			"format": "table",
+			"title": "Modbus devices",
+			"items": {
+				"type": "object",
+				"title": "Mapping",
+				"properties": {
+					"prefix": {
+						"type": "string",
+						"title": "name"
+					},
+					"id": {
+						"type": "number",
+						"minimum": 0
+					},
+					"model": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"models": {
+			"type": "array",
+			"format": "tabs",
+			"title": "Modbus device models",
+			"items": {
+				"type": "object",
+				"title": "Mapping",
+				"properties": {
+					"name": {
+						"type": "string",
+						"title": "name"
+					},
+					"model": {
+						"type": "array",
+						"format": "table",
+						"title": "Modbus device model",
+						"items": {
+							"type": "object",
+							"title": "Mapping",
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"type": {
+									"type": "string",
+									"enum": [ "input boolean", "input register", "output boolen", "output register" ]
+								},
+								"meta": {
+									"type": "object",
+									"additionalProperties": true
+								},
+								"address": {
+									"type": "number",
+									"minimum": 0
+								},
+								"datatype": {
+									"type": "string",
+									"enum": ["boolean", "uint8"],
+									"default": "uint8"
+								}
+							},
+							"required": [ "name" ]
+						}
+					},
+					"required": [ "name", "model" ]
+				}
+			}
+		}
+
+	},
+	"additionalProperties": false
+}
