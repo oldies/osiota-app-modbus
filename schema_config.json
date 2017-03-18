@@ -1,6 +1,7 @@
 {
 	"type": "object",
 	"title": "Settings",
+	"id": "app_config",
 	"properties": {
 		"connect_type": {
 			"type": "string",
@@ -9,28 +10,6 @@
 		"connect_path": {
 			"type": "string",
 			"title": "Connect Path, i.e. device path"
-		},
-		"devices": {
-			"type": "array",
-			"format": "table",
-			"title": "Modbus devices",
-			"items": {
-				"type": "object",
-				"title": "Mapping",
-				"properties": {
-					"prefix": {
-						"type": "string",
-						"title": "name"
-					},
-					"id": {
-						"type": "number",
-						"minimum": 0
-					},
-					"model": {
-						"type": "string"
-					}
-				}
-			}
 		},
 		"models": {
 			"type": "array",
@@ -61,7 +40,7 @@
 								},
 								"meta": {
 									"type": "object",
-									"additionalProperties": true
+									"additionalProperties": false
 								},
 								"address": {
 									"type": "number",
@@ -75,12 +54,46 @@
 							},
 							"required": [ "name" ]
 						}
+					}
+				},
+				"required": [ "name", "model" ]
+			}
+		},
+		"devices": {
+			"type": "array",
+			"format": "table",
+			"title": "Modbus devices",
+			"items": {
+				"type": "object",
+				"title": "Mapping",
+				"properties": {
+					"id": {
+						"type": "number",
+						"minimum": 0
 					},
-					"required": [ "name", "model" ]
+					"model": {
+						"type": "string",
+						"watch": {
+							"models": "app_config.models"
+						},
+						"enumSource": [
+							{
+								"source": ["Modbus-IO-Client"]
+							},
+							{
+								"source": "models",
+								"title": "{{item.name}}",
+								"value": "{{item.name}}"
+							}
+						]
+					},
+					"prefix": {
+						"type": "string",
+						"title": "name"
+					}
 				}
 			}
 		}
-
 	},
 	"additionalProperties": false
 }
