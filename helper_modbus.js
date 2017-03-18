@@ -44,7 +44,7 @@ exports.modbus = function(config) {
 			command_set: "writeFC16",
 			clients: {}
 		},
-		"input regiter": {
+		"input register": {
 			command_poll: "writeFC4",
 			clients: {}
 		}
