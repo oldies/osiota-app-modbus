@@ -81,7 +81,7 @@ exports.modbus = function(config) {
 };
 
 exports.modbus.prototype.client_add = function(type, cid, config) {
-	if (typeof this.commands[type] !== "obkect") {
+	if (typeof this.commands[type] !== "object") {
 		throw new Error("type undefined: " + type);
 		return;
 	}
@@ -94,7 +94,7 @@ exports.modbus.prototype.client_add = function(type, cid, config) {
 };
 
 exports.modbus.prototype.client_can_set = function(type) {
-	if (typeof this.commands[type] !== "obkect") {
+	if (typeof this.commands[type] !== "object") {
 		throw new Error("type undefined: " + type);
 		return;
 	}
@@ -106,7 +106,7 @@ exports.modbus.prototype.client_can_set = function(type) {
 };
 
 exports.modbus.prototype.client_set = function(type, cid, address, data, ext_callback) {
-	if (typeof this.commands[type] !== "obkect") {
+	if (typeof this.commands[type] !== "object") {
 		throw new Error("type undefined: " + type);
 		return;
 	}
