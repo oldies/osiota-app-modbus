@@ -27,7 +27,7 @@ exports.modbus = function(config) {
 
 	this.packet_delay = config.packet_delay;
 	this.circle_delay = config.circle_delay;
-	this.client.setTimeout(config.timeout);
+	this.client.setTimeout(config.packet_timeout);
 
 	this.commands = {
 		"output boolean": {
