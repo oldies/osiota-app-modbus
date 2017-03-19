@@ -16,7 +16,7 @@ var remap_value = function(datatype, value) {
 		return [ value*1 ];
 	}
 	else if (datatype == "boolean") {
-		return [ value != 0 ];
+		return [ value*1 ];
 	}
 	return [ value*1 ];
 };
