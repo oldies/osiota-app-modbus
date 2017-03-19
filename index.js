@@ -115,6 +115,11 @@ exports.init = function(node, app_config, main, host_info) {
 				"callback": function(data) {
 					var value = map_value(item.datatype, data);
 					n.publish(undefined, value, true);
+
+					if (item.erase && value) {
+						var ndata = remap_value(item.datatype, 0);
+						m.client_set(command, cid, item.address, ndata);
+					}
 				}
 			});
 		}
