@@ -124,6 +124,11 @@ exports.init = function(node, app_config, main, host_info) {
 			});
 		}
 		if (m.client_can_set(command)) {
+			if (typeof item.pre_set === "number") {
+				var ndata = remap_value(item.datatype, item.pre_set);
+				m.client_set(command, cid, item.address, ndata);
+			}
+
 			n.rpc_set = function(reply, value) {
 				var data = remap_value(item.datatype, value);
 				m.client_set(command, cid, item.address, data, function(err) {
