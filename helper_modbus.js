@@ -116,9 +116,9 @@ exports.modbus.prototype.client_set = function(type, cid, address, data, ext_cal
 	if (!command_set) return;
 
 	this.set_commands.push(function(next) {
-		_this.send_set(command_set, cid, address, data, function() {
+		_this.send_set(command_set, cid, address, data, function(err) {
 			if (typeof ext_callback === "function")
-				ext_callback();
+				ext_callback(err);
 			next();
 		});
 	});
@@ -154,7 +154,7 @@ exports.modbus.prototype.send_set = function(command, cid, address, data, callba
 			if (err) {
 				console.log("[set] Modbus-Error ("+cid+"):", err);
 			}
-			callback();
+			callback(err);
 		}
 	);
 };

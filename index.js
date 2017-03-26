@@ -126,8 +126,12 @@ exports.init = function(node, app_config, main, host_info) {
 		if (m.client_can_set(command)) {
 			n.rpc_set = function(reply, value) {
 				var data = remap_value(item.datatype, value);
-				m.client_set(command, cid, item.address, data, function() {
-					reply(null, "okay");
+				m.client_set(command, cid, item.address, data, function(err) {
+					if (err) {
+						reply(err, "Error");
+					} else {
+						reply(null, "okay");
+					}
 				});
 			};
 		}
