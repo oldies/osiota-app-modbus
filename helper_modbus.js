@@ -128,11 +128,18 @@ exports.modbus.prototype.send_poll = function(command, cid, address, length, cli
 	if (typeof this.client[command] !== "function") {
 		throw new Error("undefined command: " + command);
 	}
+	var already_called = false;
 	this.client[command].call(this.client,
 			cid,
 			address,
 			length,
 		function(err, data) {
+			if (already_called) {
+				console.log("Warn: Called callback twice. Command: POLL", command, cid, address, data, "\nThis happens after a timeout. Please increase the packet timeout.");
+				return;
+			}
+			already_called = true;
+
 			if (err) {
 				console.log("[poll] Modbus-Error ("+cid+"):", err);
 			} else {
@@ -146,11 +153,18 @@ exports.modbus.prototype.send_set = function(command, cid, address, data, callba
 	if (typeof this.client[command] !== "function") {
 		throw new Error("undefined command: " + command);
 	}
+	var already_called = false;
 	this.client[command].call(this.client,
 			cid,
 			address,
 			data,
 		function(err, data) {
+			if (already_called) {
+				console.log("Warn: Called callback twice. Command: SET", command, cid, address, data, "\nThis happens after a timeout. Please increase the packet timeout.");
+				return;
+			}
+			already_called = true;
+
 			if (err) {
 				console.log("[set] Modbus-Error ("+cid+"):", err);
 			}
