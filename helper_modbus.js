@@ -53,6 +53,10 @@ exports.modbus = function(config) {
 	this.poll_commands = [];
 	this.set_commands = [];
 
+	this.onerror = function(err) {
+		console.log("modbus, run:", err.stack || err);
+		return false;
+	};
 
 	this.pc_id = 0;
 	this.run_do = function() {
@@ -175,11 +179,22 @@ exports.modbus.prototype.send_set = function(command, cid, address, data, callba
 
 // open connection to a port
 exports.modbus.prototype.connect = function(connect_type, path, options) {
+	var _this = this;
 
 	if (typeof this.client["connect" + connect_type] !== "function") {
 		throw new Error("Modbus: connect type unknown");
 	}
-	this.client["connect"+connect_type](path, options, this.run.bind(this));
+	this.client["connect"+connect_type](path, options, function(err) {
+		if (err) {
+			if (_this.onerror(err))
+				return;
+		}
+
+		_this.client._port.on("error", _this.onerror);
+
+		// start run:
+		_this.run();
+	});
 
 	for (var type in this.commands) {
 	for (var cid in this.commands[type].clients) {

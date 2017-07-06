@@ -48,8 +48,18 @@ exports.init = function(node, app_config, main, host_info) {
 		}
 	}
 
+	var _this = this;
 
 	var m = new modbus.modbus(app_config);
+	m.onerror = function(err) {
+		console.log("modbus, global error:", err.stack || err);
+
+		if (this.close)
+			this.close();
+
+		_this._reinit_delay(5000);
+		return true;
+	};
 
 	var get_model = function(d) {
 		if (typeof d.client === "object") {
@@ -114,12 +124,16 @@ exports.init = function(node, app_config, main, host_info) {
 				"length": length || 1,
 				"callback": function(data) {
 					var value = map_value(item.datatype, data);
-					n.publish(undefined, value, true);
-
 					if (item.erase && value) {
+						// uninitialized?
+						if (n.value === null) {
+							// ignore value:
+							value = null;
+						}
 						var ndata = remap_value(item.datatype, 0);
 						m.client_set(command, cid, item.address, ndata);
 					}
+					n.publish(undefined, value, true);
 				}
 			});
 		}
