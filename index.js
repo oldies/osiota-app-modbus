@@ -52,7 +52,12 @@ exports.init = function(node, app_config, main, host_info) {
 
 	var m = new modbus.modbus(app_config);
 	m.onerror = function(err) {
-		console.log("modbus, global error:", err.stack || err);
+		console.log("modbus, error:", err.stack || err);
+
+		if (err.message == "Timed out")
+			return false;
+
+		// err.message == "Port Not Open"
 
 		if (this.close)
 			this.close();

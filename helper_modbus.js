@@ -129,6 +129,7 @@ exports.modbus.prototype.client_set = function(type, cid, address, data, ext_cal
 };
 
 exports.modbus.prototype.send_poll = function(command, cid, address, length, client_items, callback) {
+	var _this = this;
 	if (typeof this.client[command] !== "function") {
 		throw new Error("undefined command: " + command);
 	}
@@ -145,7 +146,9 @@ exports.modbus.prototype.send_poll = function(command, cid, address, length, cli
 			already_called = true;
 
 			if (err) {
-				console.log("[poll] Modbus-Error ("+cid+"):", err);
+				//console.log("[poll] Modbus-Error ("+cid+"):", err);
+				if (_this.onerror(err))
+					return;
 			} else {
 				read_data(client_items, address, data.data);
 			}
@@ -154,6 +157,7 @@ exports.modbus.prototype.send_poll = function(command, cid, address, length, cli
        );
 };
 exports.modbus.prototype.send_set = function(command, cid, address, data, callback) {
+	var _this = this;
 	if (typeof this.client[command] !== "function") {
 		throw new Error("undefined command: " + command);
 	}
@@ -170,7 +174,9 @@ exports.modbus.prototype.send_set = function(command, cid, address, data, callba
 			already_called = true;
 
 			if (err) {
-				console.log("[set] Modbus-Error ("+cid+"):", err);
+				//console.log("[set] Modbus-Error ("+cid+"):", err);
+				if (_this.onerror(err))
+					return;
 			}
 			callback(err);
 		}
