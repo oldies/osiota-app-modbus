@@ -48,6 +48,8 @@ exports.init = function(node, app_config, main, host_info) {
 		}
 	}
 
+	var map = node.map(config.map || [], null, true);
+
 	var _this = this;
 
 	var m = new modbus.modbus(app_config);
@@ -111,7 +113,7 @@ exports.init = function(node, app_config, main, host_info) {
 	};
 
 	var create_er_binding = function(item, command, cid, prefix, nodename) {
-		var n = node.node(prefix+nodename);
+		var n = map.node(prefix+nodename);
 		n.announce(item.meta);
 
 		var lenth = 1;
@@ -185,4 +187,6 @@ exports.init = function(node, app_config, main, host_info) {
 
 	// open connection to a port
 	m.connect(app_config.connect_type, app_config.connect_path, app_config.connect_options);
+
+	return [map, m];
 };
