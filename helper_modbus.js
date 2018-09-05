@@ -59,30 +59,36 @@ exports.modbus = function(config) {
 	};
 
 	this.pc_id = 0;
-	this.run_do = function() {
-		if (this.set_commands.length != 0) {
-			this.set_commands.shift()(this.run.bind(this));
-		} else if (this.poll_commands.length != 0) {
-			if (this.pc_id == this.poll_commands.length) {
-				setTimeout(this.run.bind(this), this.circle_delay);
-				this.pc_id = 0;
-			} else {
-				this.poll_commands[this.pc_id](this.run.bind(this));
-				this.pc_id++;
-			}
-		} else {
-			// no poll commands
-			setTimeout(this.run.bind(this), this.circle_delay);
-		}
-	};
-	this.run = function() {
-		var _this = this;
-		setTimeout(function() {
-			_this.run_do();
-		}, this.packet_delay);
-	};
-
 };
+exports.modbus.prototype.delay = function(next, timeout) {
+	this.tid = setTimeout(next.bind(this), timeout);
+};
+
+exports.modbus.prototype.run_do = function() {
+	if (this.set_commands.length != 0) {
+		this.set_commands.shift()(this.run.bind(this));
+	} else if (this.poll_commands.length != 0) {
+		if (this.pc_id >= this.poll_commands.length) {
+			this.delay(this.run, this.circle_delay);
+			this.pc_id = 0;
+		} else {
+			this.poll_commands[this.pc_id](this.run.bind(this));
+			this.pc_id++;
+		}
+	} else {
+		// no poll commands
+		this.delay(this.run, this.circle_delay);
+	}
+};
+exports.modbus.prototype.run = function() {
+	var _this = this;
+
+	if (this.closed)
+		return;
+
+	this.delay(this.run_do, this.packet_delay);
+};
+
 
 exports.modbus.prototype.client_add = function(type, cid, config) {
 	if (typeof this.commands[type] !== "object") {
@@ -228,4 +234,16 @@ exports.modbus.prototype.connect = function(connect_type, path, options) {
 	}
 	}
 
+};
+
+exports.modbus.prototype.close = function() {
+	var _this = this;
+
+	this.closed = true;
+	this.poll_commands = [];
+	this.set_commands = [];
+	if (this.tid)
+		clearTimeout(this.tid);
+
+	this.client.close();
 };
