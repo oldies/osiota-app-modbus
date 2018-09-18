@@ -48,7 +48,7 @@ exports.init = function(node, app_config, main, host_info) {
 		}
 	}
 
-	var map = node.map(config.map || [], null, true);
+	var map = node.map(app_config.map || [], null, true);
 
 	var _this = this;
 
