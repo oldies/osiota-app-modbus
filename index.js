@@ -56,7 +56,8 @@ exports.init = function(node, app_config, main, host_info) {
 	m.onerror = function(err) {
 		console.log("modbus, error:", err.stack || err);
 
-		if (err.message.match(/^Timed out/))
+		if (typeof err.message === "string" &&
+				err.message.match(/^Timed out/))
 			return false;
 
 		// err.message == "Port Not Open"
