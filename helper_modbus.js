@@ -152,6 +152,11 @@ exports.modbus.prototype.send_poll = function(command, cid, address, length, cli
 			already_called = true;
 
 			if (err) {
+				err.message += " cmd:"+command+
+					" cid:"+cid+
+					" addr:"+address+
+					" len:"+length+
+					" data:"+data;
 				//console.log("[poll] Modbus-Error ("+cid+"):", err);
 				if (_this.onerror(err))
 					return;
@@ -172,7 +177,7 @@ exports.modbus.prototype.send_set = function(command, cid, address, data, callba
 			cid,
 			address,
 			data,
-		function(err, data) {
+		function(err, new_data) {
 			if (already_called) {
 				console.log("Warn: Called callback twice. Command: SET", command, cid, address, data, "\nThis happens after a timeout. Please increase the packet timeout.");
 				return;
@@ -180,6 +185,10 @@ exports.modbus.prototype.send_set = function(command, cid, address, data, callba
 			already_called = true;
 
 			if (err) {
+				err.message += " cmd:"+command+
+					" cid:"+cid+
+					" addr:"+address+
+					" data:"+data;
 				//console.log("[set] Modbus-Error ("+cid+"):", err);
 				if (_this.onerror(err))
 					return;

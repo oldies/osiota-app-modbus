@@ -56,7 +56,7 @@ exports.init = function(node, app_config, main, host_info) {
 	m.onerror = function(err) {
 		console.log("modbus, error:", err.stack || err);
 
-		if (err.message == "Timed out")
+		if (err.message.match(/^Timed out/))
 			return false;
 
 		// err.message == "Port Not Open"
@@ -64,6 +64,7 @@ exports.init = function(node, app_config, main, host_info) {
 		if (this.close)
 			this.close();
 
+		console.log("modbus, restarting ...");
 		_this._reinit_delay(5000);
 		return true;
 	};
