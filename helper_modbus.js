@@ -199,7 +199,8 @@ exports.modbus.prototype.send_set = function(command, cid, address, data, callba
 };
 
 // open connection to a port
-exports.modbus.prototype.connect = function(connect_type, path, options) {
+exports.modbus.prototype.connect = function(connect_type, path, options,
+		callback) {
 	var _this = this;
 
 	if (typeof this.client["connect" + connect_type] !== "function") {
@@ -215,6 +216,10 @@ exports.modbus.prototype.connect = function(connect_type, path, options) {
 
 		// start run:
 		_this.run();
+
+		if (typeof callback === "function") {
+			callback();
+		}
 	});
 
 	for (var type in this.commands) {
@@ -235,7 +240,7 @@ exports.modbus.prototype.connect = function(connect_type, path, options) {
 
 		(function(_this, command, cid, address, length, client_items) {
 			_this.poll_commands.push(function(next) {
-				_this.send_poll(command, cid, address, length, client_items, next);
+				_this.send_poll(command, +cid, address, length, client_items, next);
 			});
 		})(this, this.commands[type].command_poll, cid, address_min,
 				address_max-address_min,
