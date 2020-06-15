@@ -37,19 +37,6 @@ exports.init = function(node, app_config, main, host_info) {
 		throw new Error("Modbus: connect_path not defined");
 	}
 
-	if (typeof app_config.devices !== "object" ||
-			!Array.isArray(app_config.devices)) {
-		throw new Error("Modbus: Devices not defined.");
-	}
-
-	if (typeof app_config.models === "object") {
-		for (var cn in app_config.models) {
-			models[cn] = app_config.models[cn];
-		}
-	}
-
-	var map = node.map(app_config.map || [], null, true);
-
 	var _this = this;
 
 	var m = new modbus.modbus(app_config);
@@ -69,23 +56,6 @@ exports.init = function(node, app_config, main, host_info) {
 		_this._reinit_delay(5000);
 		return true;
 	};
-
-	var get_model = function(d) {
-		if (typeof d.client === "object") {
-			return d.client;
-		}
-		if (typeof d.model === "string" &&
-				typeof models[d.model] === "object") {
-			return models[d.model];
-		}
-		if (typeof d.address !== "undefined" &&
-				typeof d.name === "string") {
-			var v = {};
-			v[d.name] = d;
-			return v;
-		}
-		throw new Error("Modbus: Client config not found.");
-	}
 
 	var map_itemtype = function(type) {
 		if (typeof type !== "string")
@@ -114,47 +84,46 @@ exports.init = function(node, app_config, main, host_info) {
 		return "output boolean";
 	};
 
-	var create_er_binding = function(item, command, cid, prefix, nodename) {
-		var n = map.node(prefix+nodename);
-		n.announce(item.meta);
+	var map = node.map(app_config.map, null, true, null,
+		function(n,metadata,config) {
+		var command = map_itemtype(config.type);
+		var cid = config.id;
 
-		var lenth = 1;
-		if (item.hasOwnProperty("length")) {
-			length = item.length;
-		} else {
-			var tmp = remap_value(item.datatype, 0);
+		var length = config.length;
+		if (typeof length !== "number") {
+			var tmp = remap_value(config.datatype, 0);
 			length = tmp.length;
 		}
 
-		if (!item.ignore) {
-			// TODO: length aus datatype ermitteln.
+		if (!config.ignore) {
 			m.client_add(command, cid, {
-				"address": item.address || 0,
+				"address": config.address || 0,
 				"length": length || 1,
 				"callback": function(data) {
-					var value = map_value(item.datatype, data);
-					if (item.erase && value) {
+					var value = map_value(config.datatype, data);
+					// better name: reset
+					if (config.erase && value) {
 						// uninitialized?
 						if (n.value === null) {
 							// ignore value:
 							value = null;
 						}
-						var ndata = remap_value(item.datatype, 0);
-						m.client_set(command, cid, item.address, ndata);
+						var ndata = remap_value(config.datatype, 0);
+						m.client_set(command, cid, config.address, ndata);
 					}
 					n.publish(undefined, value, true);
 				}
 			});
 		}
 		if (m.client_can_set(command)) {
-			if (typeof item.pre_set === "number") {
-				var ndata = remap_value(item.datatype, item.pre_set);
-				m.client_set(command, cid, item.address, ndata);
+			if (typeof config.pre_set === "number") {
+				var ndata = remap_value(config.datatype, config.pre_set);
+				m.client_set(command, cid, config.address, ndata);
 			}
 
 			n.rpc_set = function(reply, value) {
-				var data = remap_value(item.datatype, value);
-				m.client_set(command, cid, item.address, data, function(err) {
+				var data = remap_value(config.datatype, value);
+				m.client_set(command, cid, config.address, data, function(err) {
 					if (err) {
 						reply(err, "Error");
 					} else {
@@ -164,27 +133,7 @@ exports.init = function(node, app_config, main, host_info) {
 			};
 		}
 
-	};
-
-	var id = 1;
-	app_config.devices.forEach(function(d) {
-		var model = get_model(d);
-		var prefix = "";
-		if (typeof d.prefix === "string") {
-			prefix = d.prefix;
-		}
-		var cid = id;
-		if (typeof d.id === "number") {
-			cid = d.id;
-		}
-		id = cid+1;
-
-		for (var nodename in model) {
-			var item = model[nodename];
-			var command = map_itemtype(item.type);
-
-			create_er_binding(item, command, cid, prefix, nodename);
-		}
+		n.announce(metadata);
 	});
 
 	// open connection to a port
