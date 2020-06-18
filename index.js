@@ -119,6 +119,9 @@ exports.init = function(node, app_config, main, host_info) {
 			if (typeof config.pre_set === "number") {
 				var ndata = remap_value(config.datatype, config.pre_set);
 				m.client_set(command, cid, config.address, ndata);
+				if (config.ignore) {
+					n.publish(undefined, config.pre_set, true);
+				}
 			}
 
 			n.rpc_set = function(reply, value) {
