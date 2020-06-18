@@ -95,6 +95,11 @@ exports.init = function(node, app_config, main, host_info) {
 			length = tmp.length;
 		}
 
+		var type = "number";
+		if (item.datatype == "boolean") {
+			type = "boolean";
+		}
+
 		if (!config.ignore) {
 			m.client_add(command, cid, {
 				"address": config.address || 0,
@@ -115,7 +120,9 @@ exports.init = function(node, app_config, main, host_info) {
 				}
 			});
 		}
+		var writable = false;
 		if (m.client_can_set(command)) {
+			writable = true;
 			if (typeof config.pre_set === "number") {
 				var ndata = remap_value(config.datatype, config.pre_set);
 				m.client_set(command, cid, config.address, ndata);
@@ -134,9 +141,25 @@ exports.init = function(node, app_config, main, host_info) {
 					}
 				});
 			};
+			n.rpc_publish = function(reply, time, value) {
+				return n.rpc_set(reply, value, time);
+			};
 		}
 
-		n.announce(metadata);
+		var metadata_default = {
+			"type": type+".property",
+			"property": true,
+			"writable": writable,
+			"rpc": {
+			}
+		}
+		if (writable) {
+			metadata_default.rpc.set = {
+				"desc": "Set",
+				"args": [true]
+			};
+		}
+		n.announce([metadata_default, metadata]);
 	});
 
 	// open connection to a port
