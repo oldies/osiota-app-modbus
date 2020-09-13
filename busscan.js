@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 
 var modbus = require("./helper_modbus.js");
 
@@ -7,11 +8,15 @@ var app_config = {
 	"connect_path": "/dev/ttyUSB0",
 	"connect_options": {
 		"baudRate": 38400
-	}
+	},
+	"packet_timeout": 200
 };
 
 var m = new modbus.modbus(app_config);
 m.onerror = function(err) {
+	if (err.name === "TransactionTimedOutError") {
+		return;
+	}
 	console.log("modbus, error:", err.stack || err);
 };
 
