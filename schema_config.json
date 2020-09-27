@@ -1,99 +1,126 @@
 {
 	"type": "object",
-	"title": "Settings",
-	"id": "app_config",
-	"properties": {
-		"connect_type": {
-			"type": "string",
-			"enum": [ "RTU", "TCP", "Telnet", "C701", "RTUBuffered", "AsciiSerial" ]
-		},
-		"connect_path": {
-			"type": "string",
-			"title": "Connect Path, i.e. device path"
-		},
-		"models": {
-			"type": "array",
-			"format": "tabs",
-			"title": "Modbus device models",
-			"items": {
+	"title": "osiota application modbus",
+	"description": "This application connects devices via Modbus.",
+	"oneOf": [{
+		"description": "Modbus Serial Interface",
+		"properties": {
+			"connect_type": {
+				"title": "Connection Type",
+				"type": "string",
+				"enum": [ "RTU", "C701", "RTUBuffered", "AsciiSerial" ]
+			},
+			"connect_path": {
+				"type": "string",
+				"title": "Connect Path, i.e. device path"
+			},
+			"connect_options": {
+				"title": "Connect Options (Serial)",
 				"type": "object",
-				"title": "Mapping",
 				"properties": {
-					"name": {
-						"type": "string",
-						"title": "name"
-					},
-					"model": {
-						"type": "array",
-						"format": "table",
-						"title": "Modbus device model",
-						"items": {
-							"type": "object",
-							"title": "Mapping",
-							"properties": {
-								"name": {
-									"type": "string"
-								},
-								"type": {
-									"type": "string",
-									"enum": [ "input boolean", "input register", "output boolen", "output register" ]
-								},
-								"meta": {
-									"type": "object",
-									"additionalProperties": false
-								},
-								"address": {
-									"type": "number",
-									"minimum": 0
-								},
-								"datatype": {
-									"type": "string",
-									"enum": ["boolean", "uint8"],
-									"default": "uint8"
-								}
-							},
-							"required": [ "name" ]
-						}
+					"baudRate": {
+						"title": "Baud rate",
+						"type": "number"
 					}
-				},
-				"required": [ "name", "model" ]
+				}
+			},
+			"map": {
+				"$ref": "#/definitions/map"
 			}
 		},
-		"devices": {
+		"examples": [{
+			"connect_type": "RTUBuffered",
+			"connect_path": "/dev/ttyUSB0",
+			"connect_options": {
+				"baudRate": 9600
+			}
+		}]
+	},{
+		"description": "Modbus Network Interface",
+		"properties": {
+			"connect_type": {
+				"title": "Connection Type",
+				"type": "string",
+				"enum": [ "TCP", "Telnet" ]
+			},
+			"connect_path": {
+				"type": "string",
+				"title": "Host"
+			},
+			"connect_options": {
+				"title": "Connect Options (Network)",
+				"type": "object",
+				"properties": {
+					"port": {
+						"title": "Port",
+						"type": "number"
+					}
+				}
+			},
+			"map": {
+				"$ref": "#/definitions/map"
+			}
+		},
+		"examples": [{
+			"connect_type": "Telnet",
+			"connect_path": "192.168.1.101",
+			"connect_options": {
+				"port": 1234
+			}
+		}]
+	}],
+	"additionalProperties": false,
+	"definitions": {
+		"map": {
 			"type": "array",
-			"format": "table",
+			"format": "tabs",
 			"title": "Modbus devices",
 			"items": {
 				"type": "object",
-				"title": "Mapping",
 				"properties": {
+					"node": {
+						"title": "Node to map to",
+						"type": "string"
+					},
 					"id": {
+						"title": "Modbus Client ID",
 						"type": "number",
 						"minimum": 0
 					},
-					"model": {
-						"type": "string",
-						"watch": {
-							"models": "app_config.models"
-						},
-						"enumSource": [
-							{
-								"source": ["Modbus-IO-Client"]
-							},
-							{
-								"source": "models",
-								"title": "{{item.name}}",
-								"value": "{{item.name}}"
-							}
-						]
+					"address": {
+						"title": "Modbus Field Address",
+						"type": "number",
+						"minimum": 0
 					},
-					"prefix": {
+					"type": {
+						"title": "Modbus Field Type",
 						"type": "string",
-						"title": "name"
+						"enum": [ "input boolean", "input register", "output boolen", "output register" ]
+					},
+					"datatype": {
+						"title": "Field Data Type",
+						"type": "string",
+						"enum": ["boolean", "uint16"],
+						"default": "uint16"
+					},
+					"metadata": {
+						"title": "Node Metadata",
+						"type": "object",
+						"additionalProperties": true
 					}
-				}
+				},
+				"examples": [{
+					"node": "/Lamp Switch",
+					"id": 0,
+					"address": 10,
+					"type": "output boolean",
+					"datatype": "boolean",
+					"metadata": {
+						"power": 60
+					}
+				}],
+				"required": [ "id", "address", "datatype" ]
 			}
 		}
-	},
-	"additionalProperties": false
+	}
 }
