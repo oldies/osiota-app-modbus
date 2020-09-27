@@ -19,8 +19,8 @@ Modbus Serial Interface
 |----|-----------|----|
 |connect\_type|Connection Type<br/><br/>Enum: `["RTU","C701","RTUBuffered","AsciiSerial"]`|string|
 |connect\_path|Connect Path, i.e. device path<br/>|string|
-|[connect\_options](#Option 1: connect_options)|Connect Options (Serial)<br/>|object|
-|[map](#definitions/map)|Modbus devices<br/><br/>Format: `"tabs"`|object\[\]|
+|[connect\_options](#option1connect_options)|Connect Options (Serial)<br/>|object|
+|[map](#definitionsmap)|Modbus devices<br/><br/>Format: `"tabs"`|object\[\]|
 
 **Example**
 
@@ -45,8 +45,8 @@ Modbus Network Interface
 |----|-----------|----|
 |connect\_type|Connection Type<br/><br/>Enum: `["TCP","Telnet"]`|string|
 |connect\_path|Host<br/>|string|
-|[connect\_options](#Option 2: connect_options)|Connect Options (Network)<br/>|object|
-|[map](#definitions/map)|Modbus devices<br/><br/>Format: `"tabs"`|object\[\]|
+|[connect\_options](#option2connect_options)|Connect Options (Network)<br/>|object|
+|[map](#definitionsmap)|Modbus devices<br/><br/>Format: `"tabs"`|object\[\]|
 
 **Example**
 
@@ -61,7 +61,7 @@ Modbus Network Interface
 ```
 
 
-<a name="Option 1: connect_options"></a>
+<a name="option1connect_options"></a>
 ### Option 1: connect\_options: Connect Options \(Serial\)
 
 **Properties**
@@ -70,7 +70,7 @@ Modbus Network Interface
 |----|-----------|----|
 |baudRate|Baud rate<br/>|number|
 
-<a name="definitions/map"></a>
+<a name="definitionsmap"></a>
 ### definitions/map: Modbus devices
 
 **Items**
@@ -84,7 +84,7 @@ Modbus Network Interface
 |address|Modbus Field Address<br/><br/>Minimum: `0`|number|
 |type|Modbus Field Type<br/><br/>Enum: `["input boolean","input register","output boolen","output register"]`|string|
 |datatype|Field Data Type<br/><br/>Default: `"uint16"`<br/>Enum: `["boolean","uint16"]`|string|
-|[metadata](#definitions/map.metadata)|Node Metadata<br/>|object|
+|[metadata](#definitionsmapmetadata)|Node Metadata<br/>|object|
 
 **Item Required Properties:** id,address,datatype<br/>
 **Example**
@@ -104,11 +104,11 @@ Modbus Network Interface
 ]
 ```
 
-<a name="definitions/map.metadata"></a>
+<a name="definitionsmapmetadata"></a>
 #### definitions/map\.metadata: Node Metadata
 
 **Additional Properties:** `true`<br/>
-<a name="Option 2: connect_options"></a>
+<a name="option2connect_options"></a>
 ### Option 2: connect\_options: Connect Options \(Network\)
 
 **Properties**
