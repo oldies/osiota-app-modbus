@@ -259,5 +259,8 @@ exports.modbus.prototype.close = function() {
 	if (this.tid)
 		clearTimeout(this.tid);
 
-	this.client.close();
+	try {
+		this.client.close();
+	} catch(err) {
+	}
 };

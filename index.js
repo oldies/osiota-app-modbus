@@ -96,7 +96,7 @@ exports.init = function(node, app_config, main, host_info) {
 		}
 
 		var type = "number";
-		if (item.datatype == "boolean") {
+		if (config.datatype == "boolean") {
 			type = "boolean";
 		}
 
