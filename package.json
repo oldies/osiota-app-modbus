@@ -7,11 +7,16 @@
     "modbus-serial": "^7.7.2",
     "serialport": "^7.1.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "osiota-dev": "^1.x"
+  },
   "author": "Simon Walz and others",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/osiota/osiota-app-modbus.git"
+  },
+  "scripts": {
+    "doc": "osiota-dev-doc-jsonschema --schema schema.json --app $npm_package_name"
   }
 }

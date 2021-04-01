@@ -1,3 +1,11 @@
+<!--
+Auto generated documentation:
+  * Adapt schema.json and
+  * Run npm run doc
+
+Please edit schema.json or
+	https://github.com/simonwalz/osiota-dev/blob/master/partials/main.md
+-->
 <a name="root"></a>
 # osiota application modbus
 
