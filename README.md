@@ -26,7 +26,7 @@ Modbus Serial Interface
 |Name|Description|Type|
 |----|-----------|----|
 |`connect_type` (Connection Type)|Enum: `["RTU","C701","RTUBuffered","AsciiSerial"]`<br/>|string|
-|`connect_path` (Connect Path)|i.e. device path<br/>|string|
+|`connect_path`|i.e. device path<br/>|string|
 |[`connect_options`](#option1connect_options) (Serial Connect Options)||object|
 |[`map`](#definitionsmap) (Modbus devices)||object\[\]|
 
@@ -123,7 +123,7 @@ Modbus Network Interface
 
 |Name|Description|Type|
 |----|-----------|----|
-|`port` (Port)||number|
+|`port`||number|
 
 
 ## How to setup
