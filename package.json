@@ -8,7 +8,7 @@
     "serialport": "^7.1.5"
   },
   "devDependencies": {
-    "osiota-dev": "^1.x"
+    "osiota-dev": "^1.1.6"
   },
   "author": "Simon Walz and others",
   "license": "MIT",
