@@ -25,10 +25,10 @@ Modbus Serial Interface
 
 |Name|Description|Type|
 |----|-----------|----|
-|connect\_type|Connection Type<br/><br/>Enum: `["RTU","C701","RTUBuffered","AsciiSerial"]`|string|
-|connect\_path|Connect Path, i.e. device path<br/>|string|
-|[connect\_options](#option1connect_options)|Connect Options (Serial)<br/>|object|
-|[map](#definitionsmap)|Modbus devices<br/><br/>Format: `"tabs"`|object\[\]|
+|`connect_type` (Connection Type)|Enum: `["RTU","C701","RTUBuffered","AsciiSerial"]`<br/>|string|
+|`connect_path` (Connect Path)|i.e. device path<br/>|string|
+|[`connect_options`](#option1connect_options) (Serial Connect Options)||object|
+|[`map`](#definitionsmap) (Modbus devices)||object\[\]|
 
 **Example**
 
@@ -51,10 +51,10 @@ Modbus Network Interface
 
 |Name|Description|Type|
 |----|-----------|----|
-|connect\_type|Connection Type<br/><br/>Enum: `["TCP","Telnet"]`|string|
-|connect\_path|Host<br/>|string|
-|[connect\_options](#option2connect_options)|Connect Options (Network)<br/>|object|
-|[map](#definitionsmap)|Modbus devices<br/><br/>Format: `"tabs"`|object\[\]|
+|`connect_type` (Connection Type)|Enum: `["TCP","Telnet"]`<br/>|string|
+|`connect_path` (Host)|i.e. an IP address or host name<br/>|string|
+|[`connect_options`](#option2connect_options) (Network Connect Options)||object|
+|[`map`](#definitionsmap) (Modbus devices)||object\[\]|
 
 **Example**
 
@@ -70,13 +70,13 @@ Modbus Network Interface
 
 
 <a name="option1connect_options"></a>
-### Option 1: connect\_options: Connect Options \(Serial\)
+### Option 1: connect\_options: Serial Connect Options
 
 **Properties**
 
 |Name|Description|Type|
 |----|-----------|----|
-|baudRate|Baud rate<br/>|number|
+|`baudRate` (Baud rate)||number|
 
 <a name="definitionsmap"></a>
 ### definitions/map: Modbus devices
@@ -87,12 +87,12 @@ Modbus Network Interface
 
 |Name|Description|Type|
 |----|-----------|----|
-|node|Node to map to<br/>|string|
-|id|Modbus Client ID<br/><br/>Minimum: `0`|number|
-|address|Modbus Field Address<br/><br/>Minimum: `0`|number|
-|type|Modbus Field Type<br/><br/>Enum: `["input boolean","input register","output boolen","output register"]`|string|
-|datatype|Field Data Type<br/><br/>Default: `"uint16"`<br/>Enum: `["boolean","uint16"]`|string|
-|[metadata](#definitionsmapmetadata)|Node Metadata<br/>|object|
+|`node` (Node to map to)||string|
+|`id` (Modbus Client ID)|Minimum: `0`<br/>|number|
+|`address` (Modbus Field Address)|Minimum: `0`<br/>|number|
+|`type` (Modbus Field Type)|Enum: `["input boolean","input register","output boolen","output register"]`<br/>|string|
+|`datatype` (Field Data Type)|Default: `"uint16"`<br/>Enum: `["boolean","uint16"]`<br/>|string|
+|[`metadata`](#definitionsmapmetadata) (Node Metadata)||object|
 
 **Item Required Properties:** id,address,datatype<br/>
 **Example**
@@ -117,13 +117,13 @@ Modbus Network Interface
 
 **Additional Properties:** `true`<br/>
 <a name="option2connect_options"></a>
-### Option 2: connect\_options: Connect Options \(Network\)
+### Option 2: connect\_options: Network Connect Options
 
 **Properties**
 
 |Name|Description|Type|
 |----|-----------|----|
-|port|Port<br/>|number|
+|`port` (Port)||number|
 
 
 ## How to setup

@@ -12,10 +12,11 @@
 			},
 			"connect_path": {
 				"type": "string",
-				"title": "Connect Path, i.e. device path"
+				"title": "Connect Path",
+				"description": "i.e. device path"
 			},
 			"connect_options": {
-				"title": "Connect Options (Serial)",
+				"title": "Serial Connect Options",
 				"type": "object",
 				"properties": {
 					"baudRate": {
@@ -45,10 +46,11 @@
 			},
 			"connect_path": {
 				"type": "string",
-				"title": "Host"
+				"title": "Host",
+				"description": "i.e. an IP address or host name"
 			},
 			"connect_options": {
-				"title": "Connect Options (Network)",
+				"title": "Network Connect Options",
 				"type": "object",
 				"properties": {
 					"port": {
