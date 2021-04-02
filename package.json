@@ -1,6 +1,6 @@
 {
   "name": "osiota-app-modbus",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "This application connects devices via Modbus",
   "main": "index.js",
   "dependencies": {
