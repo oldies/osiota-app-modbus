@@ -16,19 +16,19 @@ Please edit schema.json or
 
 This application connects devices via Modbus.
 
-**Additional Properties:** `false`<br/>
+**Additional Properties:** not allowed<br/>
 <br>**Option 1 (alternative):** 
 Modbus Serial Interface
 
 
 **Properties**
 
-|Name|Description|Type|
-|----|-----------|----|
-|`connect_type` (Connection Type)|Enum: `["RTU","C701","RTUBuffered","AsciiSerial"]`<br/>|string|
-|`connect_path`|i.e. device path<br/>|string|
-|[`connect_options`](#option1connect_options) (Serial Connect Options)||object|
-|[`map`](#definitionsmap) (Modbus devices)||object\[\]|
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**connect_type**<br/>(Connection Type)|`string`|Enum: `"RTU"`, `"C701"`, `"RTUBuffered"`, `"AsciiSerial"`<br/>|yes|
+|**connect_path**|`string`|i.e. device path<br/>|yes|
+|[**connect_options**](#option1connect_options)<br/>(Serial Connect Options)|`object`|Additional options for connecting to modbus, i.e. the baud rate settings<br/>|no|
+|[**map**](#option1map)<br/>(Modbus devices)|`object[]`||no|
 
 **Example**
 
@@ -49,12 +49,12 @@ Modbus Network Interface
 
 **Properties**
 
-|Name|Description|Type|
-|----|-----------|----|
-|`connect_type` (Connection Type)|Enum: `["TCP","Telnet"]`<br/>|string|
-|`connect_path` (Host)|i.e. an IP address or host name<br/>|string|
-|[`connect_options`](#option2connect_options) (Network Connect Options)||object|
-|[`map`](#definitionsmap) (Modbus devices)||object\[\]|
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**connect_type**<br/>(Connection Type)|`string`|Enum: `"TCP"`, `"Telnet"`<br/>|yes|
+|**connect_path**<br/>(Host)|`string`|i.e. an IP address or host name<br/>|yes|
+|[**connect_options**](#option2connect_options)<br/>(Network Connect Options)|`object`|Additional options for connecting to modbus, i.e. the port settings<br/>|no|
+|[**map**](#option2map)<br/>(Modbus devices)|`object[]`||no|
 
 **Example**
 
@@ -72,29 +72,33 @@ Modbus Network Interface
 <a name="option1connect_options"></a>
 ### Option 1: connect\_options: Serial Connect Options
 
+Additional options for connecting to modbus, i.e. the baud rate settings
+
+See [SerialPort options](https://serialport.io/docs/api-stream#openoptions)
+
+
 **Properties**
 
-|Name|Description|Type|
-|----|-----------|----|
-|`baudRate` (Baud rate)||number|
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**baudRate**<br/>(Baud rate)|`number`||no|
 
-<a name="definitionsmap"></a>
-### definitions/map: Modbus devices
+<a name="option1map"></a>
+### Option 1: map: Modbus devices
 
-**Items**
+**Items: Modbus device**
 
 **Item Properties**
 
-|Name|Description|Type|
-|----|-----------|----|
-|`node` (Node to map to)||string|
-|`id` (Modbus Client ID)|Minimum: `0`<br/>|number|
-|`address` (Modbus Field Address)|Minimum: `0`<br/>|number|
-|`type` (Modbus Field Type)|Enum: `["input boolean","input register","output boolen","output register"]`<br/>|string|
-|`datatype` (Field Data Type)|Default: `"uint16"`<br/>Enum: `["boolean","uint16"]`<br/>|string|
-|[`metadata`](#definitionsmapmetadata) (Node Metadata)||object|
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**node**<br/>(Node to map to)|`string`||no|
+|**id**<br/>(Modbus Client ID)|`number`|Minimum: `0`<br/>|yes|
+|**address**<br/>(Modbus Field Address)|`number`|Minimum: `0`<br/>|yes|
+|**type**<br/>(Modbus Field Type)|`string`|Enum: `"input boolean"`, `"input register"`, `"output boolen"`, `"output register"`<br/>|no|
+|**datatype**<br/>(Field Data Type)|`string`|Default: `"uint16"`<br/>Enum: `"boolean"`, `"uint16"`<br/>|yes|
+|[**metadata**](#option1mapmetadata)<br/>(Node Metadata)|`object`||no|
 
-**Item Required Properties:** id,address,datatype<br/>
 **Example**
 
 ```json
@@ -112,19 +116,69 @@ Modbus Network Interface
 ]
 ```
 
-<a name="definitionsmapmetadata"></a>
-#### definitions/map\.metadata: Node Metadata
+<a name="option1mapmetadata"></a>
+#### Option 1: map\.metadata: Node Metadata
 
-**Additional Properties:** `true`<br/>
+**Additional Properties:** allowed<br/>
 <a name="option2connect_options"></a>
 ### Option 2: connect\_options: Network Connect Options
 
+Additional options for connecting to modbus, i.e. the port settings
+
+See [Connect options](https://nodejs.org/api/net.html#net_socket_connect_options_connectlistener)
+
+
 **Properties**
 
-|Name|Description|Type|
-|----|-----------|----|
-|`port`||number|
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**port**|`number`|Modbus Port<br/>Default: `502`<br/>|no|
 
+**Example**
+
+```json
+{
+    "port": 502
+}
+```
+
+<a name="option2map"></a>
+### Option 2: map: Modbus devices
+
+**Items: Modbus device**
+
+**Item Properties**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**node**<br/>(Node to map to)|`string`||no|
+|**id**<br/>(Modbus Client ID)|`number`|Minimum: `0`<br/>|yes|
+|**address**<br/>(Modbus Field Address)|`number`|Minimum: `0`<br/>|yes|
+|**type**<br/>(Modbus Field Type)|`string`|Enum: `"input boolean"`, `"input register"`, `"output boolen"`, `"output register"`<br/>|no|
+|**datatype**<br/>(Field Data Type)|`string`|Default: `"uint16"`<br/>Enum: `"boolean"`, `"uint16"`<br/>|yes|
+|[**metadata**](#option2mapmetadata)<br/>(Node Metadata)|`object`||no|
+
+**Example**
+
+```json
+[
+    {
+        "node": "/Lamp Switch",
+        "id": 0,
+        "address": 10,
+        "type": "output boolean",
+        "datatype": "boolean",
+        "metadata": {
+            "power": 60
+        }
+    }
+]
+```
+
+<a name="option2mapmetadata"></a>
+#### Option 2: map\.metadata: Node Metadata
+
+**Additional Properties:** allowed<br/>
 
 ## How to setup
 

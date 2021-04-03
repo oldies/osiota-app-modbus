@@ -17,18 +17,24 @@
 			},
 			"connect_options": {
 				"title": "Serial Connect Options",
+				"description": "Additional options for connecting to modbus, i.e. the baud rate settings\n\nSee [SerialPort options](https://serialport.io/docs/api-stream#openoptions)",
 				"type": "object",
 				"properties": {
 					"baudRate": {
 						"title": "Baud rate",
 						"type": "number"
 					}
-				}
+				},
+				"required": []
 			},
 			"map": {
 				"$ref": "#/definitions/map"
 			}
 		},
+		"required": [
+			"connect_type",
+			"connect_path"
+		],
 		"examples": [{
 			"connect_type": "RTUBuffered",
 			"connect_path": "/dev/ttyUSB0",
@@ -51,18 +57,26 @@
 			},
 			"connect_options": {
 				"title": "Network Connect Options",
+				"description": "Additional options for connecting to modbus, i.e. the port settings\n\nSee [Connect options](https://nodejs.org/api/net.html#net_socket_connect_options_connectlistener)",
 				"type": "object",
 				"properties": {
 					"port": {
 						"title": "Port",
+						"description": "Modbus Port",
+						"default": 502,
 						"type": "number"
 					}
-				}
+				},
+				"required": []
 			},
 			"map": {
 				"$ref": "#/definitions/map"
 			}
 		},
+		"required": [
+			"connect_type",
+			"connect_path"
+		],
 		"examples": [{
 			"connect_type": "Telnet",
 			"connect_path": "192.168.1.101",
@@ -79,6 +93,7 @@
 			"title": "Modbus devices",
 			"items": {
 				"type": "object",
+				"title": "Modbus device",
 				"properties": {
 					"node": {
 						"title": "Node to map to",
