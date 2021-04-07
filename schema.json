@@ -136,6 +136,7 @@
 						"power": 60
 					}
 				}],
+				"additionalProperties": false,
 				"required": [ "id", "address", "datatype" ]
 			}
 		}
