@@ -163,7 +163,8 @@ exports.init = function(node, app_config, main, host_info) {
 	});
 
 	// open connection to a port
-	m.connect(app_config.connect_type, app_config.connect_path, app_config.connect_options);
+	m.connect(app_config.connect_type, app_config.connect_path,
+		JSON.parse(JSON.stringify(app_config.connect_options || {})));
 
 	return [map, m];
 };
