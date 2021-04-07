@@ -112,7 +112,7 @@
 					"type": {
 						"title": "Modbus Field Type",
 						"type": "string",
-						"enum": [ "input boolean", "input register", "output boolen", "output register" ]
+						"enum": [ "input boolean", "input register", "output boolean", "output register" ]
 					},
 					"datatype": {
 						"title": "Field Data Type",
