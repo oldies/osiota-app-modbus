@@ -54,7 +54,7 @@ exports.modbus = function(config) {
 	this.set_commands = [];
 
 	this.onerror = function(err) {
-		console.log("modbus, run:", err.stack || err);
+		console.error("modbus, run:", err.stack || err);
 		return false;
 	};
 
@@ -146,7 +146,7 @@ exports.modbus.prototype.send_poll = function(command, cid, address, length, cli
 			length,
 		function(err, data) {
 			if (already_called) {
-				console.log("Warn: Called callback twice. Command: POLL", command, cid, address, data, "\nThis happens after a timeout. Please increase the packet timeout.");
+				console.warn("Warn: Called callback twice. Command: POLL", command, cid, address, data, "\nThis happens after a timeout. Please increase the packet timeout.");
 				return;
 			}
 			already_called = true;
@@ -179,7 +179,7 @@ exports.modbus.prototype.send_set = function(command, cid, address, data, callba
 			data,
 		function(err, new_data) {
 			if (already_called) {
-				console.log("Warn: Called callback twice. Command: SET", command, cid, address, data, "\nThis happens after a timeout. Please increase the packet timeout.");
+				console.warn("Warn: Called callback twice. Command: SET", command, cid, address, data, "\nThis happens after a timeout. Please increase the packet timeout.");
 				return;
 			}
 			already_called = true;

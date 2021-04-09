@@ -41,7 +41,7 @@ exports.init = function(node, app_config, main, host_info) {
 
 	var m = new modbus.modbus(app_config);
 	m.onerror = function(err) {
-		console.log("modbus, error:", err.stack || err);
+		console.error("modbus, error:", err.stack || err);
 
 		if (typeof err.message === "string" &&
 				err.message.match(/^Timed out/))
@@ -52,7 +52,7 @@ exports.init = function(node, app_config, main, host_info) {
 		if (this.close)
 			this.close();
 
-		console.log("modbus, restarting ...");
+		console.info("modbus, restarting ...");
 		_this._reinit_delay(5000);
 		return true;
 	};
