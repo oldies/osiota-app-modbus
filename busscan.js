@@ -15,13 +15,19 @@ var app_config = {
 var m = new modbus.modbus(app_config);
 m.onerror = function(err) {
 	if (err.name === "TransactionTimedOutError") {
+		m.client._port.openFlag = true;
 		return;
 	}
 	console.log("modbus, error:", err.stack || err);
 };
 
 
-m.connect(app_config.connect_type, app_config.connect_path, app_config.connect_options, function() {
+m.connect(app_config.connect_type, app_config.connect_path, app_config.connect_options, function(err) {
+	if (err) {
+		console.error("Error:", err);
+		return;
+	}
+	console.log("Connected");
 	scan();
 });
 
