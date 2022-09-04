@@ -9,6 +9,9 @@ var map_value = function(datatype, data, buffer) {
 	else if (datatype == "floatBE") {
 		return buffer.readFloatBE(0);
 	}
+	else if (datatype == "floatLE") {
+		return buffer.readFloatLE(0);
+	}
 	else if (datatype == "boolean") {
 		return data[0] != 0;
 	}
@@ -25,6 +28,11 @@ var remap_value = function(datatype, value) {
 		return buffer;
 		//return new Uint16Array(buffer.buffer,buffer.byteOffset,buffer.length/2);
 		//return [ buffer.readUInt16BE(0), buffer.readUInt16BE(2) ];
+	}
+	if (datatype == "floatLE") {
+		let buffer = Buffer.alloc(4);
+		buffer.writeFloatLE(value);
+		return buffer;
 	}
 	else if (datatype == "boolean") {
 		return [ value*1 ];
