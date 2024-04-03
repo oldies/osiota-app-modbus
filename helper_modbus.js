@@ -1,10 +1,12 @@
 
 var ModbusRTU = require("modbus-serial");
 
-var read_data = function(client_items, address_min, data) {
+var read_data = function(client_items, address_min, data, buffer) {
 	client_items.forEach(function(c) {
 		c.callback(data.slice(c.address-address_min,
-				c.address-address_min+c.length));
+				c.address-address_min+c.length),
+			buffer.slice(2*(c.address-address_min),
+				2*(c.address-address_min+c.length)));
 	});
 };
 
@@ -28,6 +30,10 @@ exports.modbus = function(config) {
 	this.packet_delay = config.packet_delay;
 	this.circle_delay = config.circle_delay;
 	this.client.setTimeout(config.packet_timeout);
+	this.max_payload = 60;
+	if (typeof config.max_payload === "number") {
+		this.max_payload = config.max_payload;
+	}
 
 	this.commands = {
 		"output boolean": {
@@ -95,12 +101,16 @@ exports.modbus.prototype.client_add = function(type, cid, config) {
 		throw new Error("type undefined: " + type);
 		return;
 	}
+	var gid = config.address - (config.address % this.max_payload);
 	if (typeof this.commands[type].clients[cid] !== "object" ||
-			!Array.isArray(this.commands[type].clients[cid])) {
-		this.commands[type].clients[cid] = [];
+			this.commands[type].clients[cid] === null) {
+		this.commands[type].clients[cid] = {"groups": []};
+	}
+	if (!Array.isArray(this.commands[type].clients[cid].groups[gid])) {
+		this.commands[type].clients[cid].groups[gid] = [];
 	}
 
-	this.commands[type].clients[cid].push(config);
+	this.commands[type].clients[cid].groups[gid].push(config);
 };
 
 exports.modbus.prototype.client_can_set = function(type) {
@@ -161,11 +171,11 @@ exports.modbus.prototype.send_poll = function(command, cid, address, length, cli
 				if (_this.onerror(err))
 					return;
 			} else {
-				read_data(client_items, address, data.data);
+				read_data(client_items, address, data.data, data.buffer);
 			}
 			callback();
 		}
-       );
+	);
 };
 exports.modbus.prototype.send_set = function(command, cid, address, data, callback) {
 	var _this = this;
@@ -222,11 +232,14 @@ exports.modbus.prototype.connect = function(connect_type, path, options,
 		}
 	});
 
-	for (var type in this.commands) {
-	for (var cid in this.commands[type].clients) {
-		var address_min = null;
-		var address_max = null;
-		this.commands[type].clients[cid].forEach(function(c) {
+	this.poll_commands = [];
+	for (let type in this.commands) {
+	for (let cid in this.commands[type].clients) {
+	for (let gid in this.commands[type].clients[cid].groups) {
+		let address_min = null;
+		let address_max = null;
+		this.commands[type].clients[cid].groups[gid].
+				forEach(function(c) {
 			if (address_min === null || c.address < address_min) {
 				address_min = c.address;
 			}
@@ -238,13 +251,22 @@ exports.modbus.prototype.connect = function(connect_type, path, options,
 		//commands[type].clients[cid].address = address_min;
 		//commands[type].clients[cid].length = address_max-address_min;
 
-		(function(_this, command, cid, address, length, client_items) {
-			_this.poll_commands.push(function(next) {
-				_this.send_poll(command, +cid, address, length, client_items, next);
-			});
-		})(this, this.commands[type].command_poll, cid, address_min,
-				address_max-address_min,
-				this.commands[type].clients[cid]);
+		let command = this.commands[type].command_poll;
+		let address = address_min;
+		let length = address_max-address_min;
+		let client_items = this.commands[type].clients[cid].groups[gid];
+
+		this.poll_commands.push(function(next) {
+			_this.send_poll(
+				command,
+				+cid,
+				address_min,
+				length,
+				client_items,
+				next
+			);
+		});
+	}
 	}
 	}
 

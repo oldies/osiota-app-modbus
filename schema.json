@@ -1,6 +1,6 @@
 {
 	"type": "object",
-	"title": "osiota application modbus",
+	"title": "osiota Application Modbus",
 	"description": "This application connects devices via Modbus.",
 	"oneOf": [{
 		"description": "Modbus Serial Interface",

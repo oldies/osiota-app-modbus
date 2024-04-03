@@ -1,9 +1,24 @@
 
 var modbus = require("./helper_modbus.js");
 
-var map_value = function(datatype, data) {
+var map_value = function(datatype, data, buffer) {
 	if (datatype == "uint16") {
+		//return buffer.readUInt16BE(0);
 		return data[0];
+	}
+	else if (datatype == "floatBE") {
+		return buffer.readFloatBE(0);
+	}
+	else if (datatype == "floatLE") {
+		return buffer.readFloatLE(0);
+	}
+	else if (datatype == "floatBE-swap") {
+		buffer.swap16();
+		return buffer.readFloatBE(0);
+	}
+	else if (datatype == "floatLE-swap") {
+		buffer.swap16();
+		return buffer.readFloatLE(0);
 	}
 	else if (datatype == "boolean") {
 		return data[0] != 0;
@@ -15,6 +30,30 @@ var remap_value = function(datatype, value) {
 	if (datatype == "uint16") {
 		return [ value*1 ];
 	}
+	if (datatype == "floatBE") {
+		let buffer = Buffer.alloc(4);
+		buffer.writeFloatBE(value);
+		return buffer;
+		//return new Uint16Array(buffer.buffer,buffer.byteOffset,buffer.length/2);
+		//return [ buffer.readUInt16BE(0), buffer.readUInt16BE(2) ];
+	}
+	else if (datatype == "floatLE") {
+		let buffer = Buffer.alloc(4);
+		buffer.writeFloatLE(value);
+		return buffer;
+	}
+	else if (datatype == "floatBE-swap") {
+		let buffer = Buffer.alloc(4);
+		buffer.writeFloatBE(value);
+		buffer.swap16();
+		return buffer;
+	}
+	else if (datatype == "floatLE-swap") {
+		let buffer = Buffer.alloc(4);
+		buffer.writeFloatLE(value);
+		buffer.swap16();
+		return buffer;
+	}
 	else if (datatype == "boolean") {
 		return [ value*1 ];
 	}
@@ -22,11 +61,6 @@ var remap_value = function(datatype, value) {
 };
 
 exports.init = function(node, app_config, main, host_info) {
-
-	var baudrate = 38400;
-
-	var models = {};
-
 	if (typeof app_config !== "object") {
 		app_config = {};
 	}
@@ -60,13 +94,13 @@ exports.init = function(node, app_config, main, host_info) {
 	var map_itemtype = function(type) {
 		if (typeof type !== "string")
 			return "output boolean";
-		if (type.match(/FC1/i))
+		if (type.match(/^FC(1|5|15)$/i))
 			return "output boolean";
-		if (type.match(/FC2/i))
+		if (type.match(/^FC2$/i))
 			return "input boolean";
-		if (type.match(/FC3/i))
+		if (type.match(/^FC(3|6|16)$/i))
 			return "output register";
-		if (type.match(/FC4/i))
+		if (type.match(/^FC4$/i))
 			return "input register";
 
 		if (type.match(/coil/))
@@ -84,6 +118,10 @@ exports.init = function(node, app_config, main, host_info) {
 		return "output boolean";
 	};
 
+	node.announce({
+		"type": "modbus.app"
+	});
+
 	var map = node.map(app_config.map, null, true, null,
 		function(n,metadata,config) {
 		var command = map_itemtype(config.type);
@@ -92,7 +130,11 @@ exports.init = function(node, app_config, main, host_info) {
 		var length = config.length;
 		if (typeof length !== "number") {
 			var tmp = remap_value(config.datatype, 0);
-			length = tmp.length;
+			if (Buffer.isBuffer(tmp)) {
+				length = tmp.length / 2;
+			} else {
+				length = tmp.length;
+			}
 		}
 
 		var type = "number";
@@ -104,8 +146,8 @@ exports.init = function(node, app_config, main, host_info) {
 			m.client_add(command, cid, {
 				"address": config.address || 0,
 				"length": length || 1,
-				"callback": function(data) {
-					var value = map_value(config.datatype, data);
+				"callback": function(data, buffer) {
+					var value = map_value(config.datatype, data, buffer);
 					// better name: reset
 					if (config.erase && value) {
 						// uninitialized?
@@ -141,6 +183,9 @@ exports.init = function(node, app_config, main, host_info) {
 					}
 				});
 			};
+			n.rpc_toggle = function(reply, time) {
+				return n.rpc_set(reply, !n.value, time);
+			};
 			n.rpc_publish = function(reply, time, value) {
 				return n.rpc_set(reply, value, time);
 			};
@@ -166,5 +211,5 @@ exports.init = function(node, app_config, main, host_info) {
 	m.connect(app_config.connect_type, app_config.connect_path,
 		JSON.parse(JSON.stringify(app_config.connect_options || {})));
 
-	return [map, m];
+	return [node, map, m];
 };
