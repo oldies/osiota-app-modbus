@@ -171,6 +171,9 @@ exports.init = function(node, app_config, main, host_info) {
 				"length": length || 1,
 				"callback": function(data, buffer) {
 					var value = map_value(config.datatype, data, buffer);
+					// Multiplikator
+					if (config.multiplier)
+						value = value * config.multiplier;
 					// better name: reset
 					if (config.erase && value) {
 						// uninitialized?
@@ -197,6 +200,9 @@ exports.init = function(node, app_config, main, host_info) {
 			}
 
 			n.rpc_set = function(reply, value) {
+				// Multiplikator
+				if (config.multiplier)
+					value = value / config.multiplier;
 				var data = remap_value(config.datatype, value);
 				m.client_set(command, cid, config.address, data, function(err) {
 					if (err) {
