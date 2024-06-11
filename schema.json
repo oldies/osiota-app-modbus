@@ -117,8 +117,13 @@
 					"datatype": {
 						"title": "Field Data Type",
 						"type": "string",
-						"enum": ["boolean", "uint16"],
+						"enum": ["boolean", "uint16", "int16", "uint32BE", "uint32LE"],
 						"default": "uint16"
+					},
+					"multiplier": {
+						"title": "Modbus Value Multiplier",
+						"type": "number",
+						"default": 1
 					},
 					"metadata": {
 						"title": "Node Metadata",
