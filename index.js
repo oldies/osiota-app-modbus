@@ -6,6 +6,15 @@ var map_value = function(datatype, data, buffer) {
 		//return buffer.readUInt16BE(0);
 		return data[0];
 	}
+	else if (datatype == "int16") {
+		return buffer.readInt16BE(0);
+	}
+	else if (datatype == "uint32BE") {
+		return buffer.readUInt32BE(0);
+	}
+	else if (datatype == "uint32LE") {
+		return buffer.readUInt32LE(0);
+	}
 	else if (datatype == "floatBE") {
 		return buffer.readFloatBE(0);
 	}
@@ -29,8 +38,22 @@ var map_value = function(datatype, data, buffer) {
 var remap_value = function(datatype, value) {
 	if (datatype == "uint16") {
 		return [ value*1 ];
+	} else if (datatype == "int16") {
+		let buffer = Buffer.alloc(2);
+		buffer.writeInt16BE(value);
+		return buffer;
 	}
-	if (datatype == "floatBE") {
+	else if (datatype == "uint32BE") {
+		let buffer = Buffer.alloc(4);
+		buffer.writeUInt32BE(value);
+		return buffer;
+	}
+	else if (datatype == "uint32LE") {
+		let buffer = Buffer.alloc(4);
+		buffer.writeUInt32LE(value);
+		return buffer;
+	}
+	else if (datatype == "floatBE") {
 		let buffer = Buffer.alloc(4);
 		buffer.writeFloatBE(value);
 		return buffer;
